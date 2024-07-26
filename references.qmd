@@ -1,0 +1,113 @@
+---
+format:
+  revealjs: 
+    theme: simple
+execute:
+  echo: false
+---
+
+```{r}
+#| message: false
+library(jstager)
+library(dplyr)
+library(visNetwork)
+library(RColorBrewer)
+library(knitr)
+library(kableExtra)
+
+d <- jstage_references("10.1241/johokanri.49.63", depth = 3)
+
+edges <- d |>
+  mutate(cited_doi = ifelse(is.na(cited_doi),
+                            paste0("non-DOI ", row_number()),
+                            cited_doi)) |>
+  select(from = cited_doi, to = citing_doi)
+
+nodes <- data.frame(id = unique(c(edges$from, edges$to))) |>
+  left_join(
+    d |>
+      select(cited_doi, article_link) |>
+      na.omit() |>
+      distinct(),
+    by = c("id" = "cited_doi")
+  ) |>
+  mutate(
+    group = ifelse(!is.na(article_link), "J-Stage", "Outside J-Stage"),
+    title = paste0("https://doi.org/", id)
+  )
+nodes$group[nodes$id == d$citing_doi[1]] <- "J-Stage"
+```
+
+<style>
+.panel-tabset-tabby a {
+  font-size: 16px !important;
+}
+</style>
+
+::: {.panel-tabset}
+
+## Figure
+
+```{r}
+palette <- brewer.pal(6, "Paired")
+normal_col <- palette[c(1, 5)]
+highlight_col <- palette[c(2, 6)]
+names(normal_col) <- unique(nodes$group)
+names(highlight_col) <- unique(nodes$group)
+
+nodes$color.background <- normal_col[nodes$group]
+nodes$color.border <- highlight_col[nodes$group]
+nodes$color.highlight.background <- highlight_col[nodes$group]
+nodes$color.hover.background <- highlight_col[nodes$group]
+
+visNetwork(nodes, edges, width = "100%") |>
+  visNodes(shape = "box", shadow = TRUE) |>
+  visEdges(arrows = 'to', shadow = TRUE, color = "black") |>
+  visLegend(
+    useGroups = FALSE,
+    addNodes = list(
+      list(
+        label = names(normal_col[1]),
+        shape = "box",
+        color = list(
+          background = normal_col[[1]],
+          border = highlight_col[[1]]
+        )
+      ),
+      list(
+        label = names(normal_col[2]),
+        shape = "box",
+        color = list(
+          background = normal_col[[2]],
+          border = highlight_col[[2]]
+        )
+      )
+    )
+  ) |>
+  visEvents(selectNode = "function(nodes) {
+    var nodeId = nodes.nodes[0];
+    var url = this.body.data.nodes.get(nodeId).title;
+    if (url !== 'NA') {
+      window.open(url, '_blank');
+    }
+  }") |>
+  visOptions(
+    highlightNearest = list(
+      enabled = TRUE, 
+      degree = 1, 
+      hover = TRUE
+    ), 
+    nodesIdSelection = TRUE
+  ) |>
+  visLayout(randomSeed = 100)
+```
+
+
+## Table
+
+```{r}
+kable(d, format = "html") |>
+  kable_styling(font_size = 16, full_width = TRUE)
+```
+
+:::
