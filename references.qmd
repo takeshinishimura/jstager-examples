@@ -15,7 +15,8 @@ library(RColorBrewer)
 library(knitr)
 library(kableExtra)
 
-d <- jstage_references("10.1241/johokanri.49.63", depth = 2)
+# d <- jstage_references("10.1241/johokanri.49.63", depth = 2)
+d <- read.csv("./data/data.csv")
 
 edges <- d |>
   mutate(cited_doi = ifelse(is.na(cited_doi),
