@@ -828,13 +828,13 @@
       }
     },
     "jstager": {
-      "Source": "github",
-      "Repository": null,
+      "Source": "CRAN",
+      "Repository": "https://cloud.r-project.org",
       "description": {
         "Package": "jstager",
         "Type": "Package",
         "Title": "Retrieve Information Published on J-STAGE",
-        "Version": "0.0.5.9000",
+        "Version": "0.0.5",
         "Authors@R": "\n    person(given = \"Takeshi\",\n           family = \"Nishimura\",\n           email = \"takenishi@gmail.com\",\n           role = c(\"aut\", \"cph\", \"cre\"),\n           comment = c(ORCID = \"0000-0003-1761-4300\"))",
         "Description": "Provides tools to access the J-STAGE WebAPI and retrieve \n    information published on J-STAGE \n    <https://www.jstage.jst.go.jp/browse/-char/ja>.",
         "License": "MIT + file LICENSE",
@@ -1933,9 +1933,6 @@
     }
   },
   "files": {
-    ".Rapp.history": {
-      "checksum": "701621785d938999ddf026515cfa5a1b"
-    },
     "app.R": {
       "checksum": "3ac86a3e73280701e1dd72097275ec1a"
     }
